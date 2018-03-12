@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/background_light"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/palabra_clave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="13dp"
+        android:layout_marginStart="13dp"
+        android:layout_toEndOf="@+id/iconoItem"
+        android:layout_toRightOf="@+id/iconoItem"
+        android:text="palabraClave"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@android:color/background_dark"
+        android:textSize="20sp" />
+
+    <ListView
+        android:id="@+id/listaMateriales"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/nombre_material"
+        android:layout_marginTop="47dp"
+        android:background="@android:color/background_light"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iconoItem"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true" />
+
+    <TextView
+        android:id="@+id/tipoMaterial_itemLista"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignLeft="@+id/palabra_clave"
+        android:layout_alignStart="@+id/palabra_clave"
+        android:layout_below="@+id/palabra_clave"
+        android:text="tipo de material" />
+
+</RelativeLayout>

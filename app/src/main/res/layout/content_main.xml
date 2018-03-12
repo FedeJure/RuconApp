@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.ruccon.clases.rucconapp.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <Button
+        android:id="@+id/botonBuscar"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="229dp"
+        android:layout_height="43dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="492dp"
+        android:background="@android:drawable/editbox_background"
+        android:backgroundTint="?attr/colorAccent"
+        android:onClick="@string/title_activity_main"
+        android:text="Buscar"
+        android:textAlignment="gravity"
+        android:textDirection="anyRtl"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteY="508dp" />
+
+    <SearchView
+        android:id="@+id/barra_de_busqueda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="60dp"
+        android:background="#ddffffff"
+        android:elevation="5dp"
+        android:iconifiedByDefault="false"
+        android:queryHint="Buscar..."
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/TipoDeFiltro"
+        android:layout_width="370dp"
+        android:layout_height="54dp"
+        android:layout_column="0"
+        android:layout_marginTop="9dp"
+        android:layout_row="0"
+        android:background="@android:drawable/editbox_dropdown_dark_frame"
+        android:elevation="5dp"
+        android:text="Materia"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/barra_de_busqueda"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/flipper"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="@+id/flipper"
+        app:layout_constraintHorizontal_bias="1.0" />
+
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_below="@+id/barra_de_busqueda"
+        android:elevation="15dp"
+        android:visibility="gone"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="@+id/barra_de_busqueda"
+        app:layout_constraintTop_toBottomOf="@+id/barra_de_busqueda" />
+
+    <Button
+        android:id="@+id/botonDerecha"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginRight="137dp"
+        android:layout_marginTop="0dp"
+
+        android:background="@android:drawable/ic_media_ff"
+        android:textStyle="bold"
+        app:layout_constraintRight_toRightOf="@+id/flipper"
+        app:layout_constraintTop_toBottomOf="@+id/flipper" />
+
+    <Button
+        android:id="@+id/botonIzquierda"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="-121dp"
+        android:background="@android:drawable/ic_media_rew"
+
+        android:textStyle="bold"
+        app:layout_constraintRight_toLeftOf="@+id/botonDerecha"
+        app:layout_constraintTop_toBottomOf="@+id/flipper"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/flipper"
+        app:layout_constraintHorizontal_bias="1.0" />
+
+    <ViewFlipper
+        android:id="@+id/flipper"
+        android:layout_width="370dp"
+        android:layout_height="280dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="63dp"
+        android:background="@android:color/darker_gray"
+        android:elevation="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/barra_de_busqueda">
+
+
+        <GridLayout
+            android:id="@+id/filtrosMateria"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layoutMode="clipBounds"
+            android:scrollX="0dp"
+            android:tag="Materia">
+
+        </GridLayout>
+
+        <ScrollView
+            android:id="@+id/scroll_view_temas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <GridLayout
+                android:id="@+id/filtrosTema"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:tag="Temas">
+
+            </GridLayout>
+        </ScrollView>
+
+        <GridLayout
+            android:id="@+id/filtrosTipo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tag="Tipo de material">
+
+        </GridLayout>
+
+        <GridLayout
+            android:id="@+id/filtrosNivel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tag="Nivel">
+
+        </GridLayout>
+
+        <GridLayout
+            android:id="@+id/filtrosTipoImpresion"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tag="Tipo de impresíon">
+
+        </GridLayout>
+
+    </ViewFlipper>
+
+
+</android.support.constraint.ConstraintLayout>
