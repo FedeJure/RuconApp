@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ruccon.clases.rucconapp">
-    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -22,8 +25,8 @@
         <activity android:name=".ItemDeLista" />
         <activity android:name=".DetalleMaterial" />
         <activity android:name=".ElegirTipoMaterial" />
-        <activity android:name=".BusquedaFiltrada"></activity>
-
+        <activity android:name=".BusquedaFiltrada" />
+        <activity android:name=".BusquedaPorPalabraClave"></activity>
     </application>
 
 </manifest>

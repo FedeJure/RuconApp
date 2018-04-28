@@ -138,4 +138,26 @@ public class Material {
     public boolean esImpresion(){
         return (tipoImpresion.contains("Impresión"));
     }
+
+    public ArrayList<String> getTemasConPalabraClave(String s) {
+        ArrayList<String> aux =new ArrayList<>();
+        for (String st : palabrasClave.keySet()){
+            if (st.contains(s)){
+                st = st+" [Página: "+ paginaDe(st)+"]";
+                aux.add(st);
+            }
+        }
+        return aux;
+    }
+
+    public ArrayList<String> getTemasConPagina() {
+        ArrayList<String> aux = new ArrayList<>();
+
+        for (int i= 0; i< temas.size(); i++){
+            String s = temas.get(i)+" [Página: " + paginaDe(temas.get(i)) + "]";
+            aux.add(s);
+        }
+
+        return aux;
+    }
 }

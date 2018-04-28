@@ -3,6 +3,7 @@ package com.ruccon.clases.rucconapp;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Path;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
@@ -21,6 +22,8 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -33,6 +36,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.GridLayout;
 
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -40,6 +44,7 @@ import android.widget.Toast;
 import android.widget.SearchView;
 import android.widget.ViewFlipper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -49,13 +54,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private SearchView barraDeBusqueda;
     private ListView listView;
     ListViewAdapter listAdapter;
-    GridLayout grillaDeBotones;
     ViewFlipper flipper;
     static Vibrator  vibrador;
-
-    private ManejadorBaseDeDatos manejadorDB;
-
     private static Context appContext;
+    private static AppCompatActivity miInstancia;
 
     private HashMap<String,ArrayList<String>> filtrosAplicados;
     GridLayout filtrosMateria;
@@ -63,10 +65,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     GridLayout filtrosTipo;
     GridLayout filtrosTipoImpresion;
     GridLayout filtrosNivel;
-    private Button botonIzquierda;
-    private Button botonDerecha;
     private Button botonBuscar;
-    TextView tipoDeFiltro;
+    private Button botonActualizar;
 
 
 
@@ -75,20 +75,23 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         appContext = this.getApplicationContext();
-
+        miInstancia = this;
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        manejadorDB = ManejadorBaseDeDatos.instancia();
         filtrosAplicados = new HashMap<>();
         vibrador = ((Vibrator) getSystemService(VIBRATOR_SERVICE));
         vibrador.cancel();
 
+        try {
+            materiales = MaterialesRuccon.getInstance();
+        } catch (IOException e) {
+            mostrarMensajeLargo("No se pudo cargar la base de datos");
+            return;
+        } catch (android.os.NetworkOnMainThreadException e){
+            mostrarMensajeLargo("El servidor esta caido, vuelve a intentarlo mas tarde");
+        }
 
-        materiales = MaterialesRuccon.getInstance();
-
-
-        tipoDeFiltro = (TextView) findViewById(R.id.TipoDeFiltro);
 
         listView = (ListView) findViewById(R.id.listview);
         listAdapter = new ListViewAdapter(this,materiales.getListaPalabrasClave(),listView,materiales);
@@ -106,42 +109,33 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         barraDeBusqueda.setOnQueryTextListener(this);
 
         flipper = (ViewFlipper) findViewById(R.id.flipper);
-        botonDerecha = (Button) findViewById(R.id.botonDerecha);
-        botonIzquierda = (Button) findViewById(R.id.botonIzquierda);
+
+        botonActualizar = (Button) findViewById(R.id.botonActualizar);
+        botonActualizar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ManejadorBaseDeDatos.instancia().actualizarBaseDeDatos();
+                Intent intent = getIntent();
+                overridePendingTransition(0, 0);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                finish();
+                overridePendingTransition(0, 0);
+                startActivity(intent);
+            }
+        });
+
         botonBuscar = (Button) findViewById(R.id.botonBuscar);
         Animation in = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
         Animation out = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
-
-        flipper.setInAnimation(in);
-        flipper.setOutAnimation(out);
 
 
 
 
 
         flipper.setPadding(0,0,0,20);
-        flipper.setOnTouchListener(new DeslizarTouchListener(flipper,tipoDeFiltro));
-        ((ScrollView)findViewById(R.id.scroll_view_temas)).setOnTouchListener(new DeslizarTouchListener(flipper,tipoDeFiltro));
-
-        botonDerecha.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MainActivity.vibrar(50L);
-                flipper.showNext();
-                tipoDeFiltro.setText((String)flipper.getCurrentView().getTag());
-
-
-            }
-        });
-
-        botonIzquierda.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MainActivity.vibrar(50L);
-                flipper.showPrevious();
-                tipoDeFiltro.setText((String)flipper.getCurrentView().getTag());
-            }
-        });
+        flipper.setOnTouchListener(new DeslizarTouchListener(flipper,this));
+        final ScrollView scrollTemas = ((ScrollView)findViewById(R.id.scroll_view_temas));
+        scrollTemas.setOnTouchListener(new DeslizarTouchListener(flipper,this,scrollTemas));
         final Context thiscontext = this;
 
 
@@ -163,11 +157,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         filtrosNivel = (GridLayout) flipper.findViewById(R.id.filtrosNivel);
         filtrosTipo = (GridLayout) flipper.findViewById(R.id.filtrosTipo);
         filtrosTipoImpresion = (GridLayout) flipper.findViewById(R.id.filtrosTipoImpresion);
-        filtrosMateria.setColumnCount(2);
+        filtrosMateria.setColumnCount(1);
         filtrosTema.setColumnCount(1);
-        filtrosNivel.setColumnCount(2);
-        filtrosTipo.setColumnCount(2);
-        filtrosTipoImpresion.setColumnCount(2);
+        filtrosNivel.setColumnCount(1);
+        filtrosTipo.setColumnCount(1);
+        filtrosTipoImpresion.setColumnCount(1);
 
         filtrosAplicados.put("materia",new ArrayList<String>());
         filtrosAplicados.put("tema",new ArrayList<String>());
@@ -181,17 +175,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         setearFiltrosNivel();
         setearFiltrosTipo();
         setearFiltrosTipoImpresion();
-
-
-
-
+        if(getCurrentFocus() != null){
+            getCurrentFocus().clearFocus();
+        }
 
     }
 
+
     private void setearFiltrosMateriasYTemas() {
         for (final String nombreMat : materiales.getMaterias()){
-            CheckBox b = crearChecBox(nombreMat);
-            b.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            GridLayout b = crearChecBox(nombreMat);
+            ((CheckBox)b.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked){
@@ -199,9 +193,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                         //ArrayList<String> aux=materiales.getTemasDe(nombreMat);
                         //filtrosAplicados.get("tema").addAll(aux);
                         ArrayList<String> aux=materiales.getTemasDe(nombreMat);
-                        filtrosAplicados.get("tema").add(aux.get(0));
-
-
                         agregarFiltroTemaCon(aux);
                     }
 
@@ -210,7 +201,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                         //ArrayList<String> aux=materiales.getTemasDe(nombreMat);
                         //filtrosAplicados.get("tema").removeAll(aux);
                         ArrayList<String> aux=materiales.getTemasDe(nombreMat);
-                        filtrosAplicados.get("tema").remove(aux.get(0));
                         quitarFiltroTemaCon(aux);
                     }
                 }
@@ -224,8 +214,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
     private void setearFiltrosTipoImpresion() {
         for (final String tipoImpresion: materiales.getTipoImpresion()){
-            CheckBox b = crearChecBox(tipoImpresion);
-            b.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            GridLayout b = crearChecBox(tipoImpresion);
+            ((CheckBox)b.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
 
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -242,8 +232,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
     private void setearFiltrosNivel(){
         for (final String nivel : materiales.getNiveles()) {
-            CheckBox b = crearChecBox(nivel);
-            b.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            GridLayout b = crearChecBox(nivel);
+            ((CheckBox)b.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
 
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -260,8 +250,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
     private void setearFiltrosTipo(){
         for (final String tipo: materiales.getTipos()){
-            CheckBox b = crearChecBox(tipo);
-            b.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            GridLayout b = crearChecBox(tipo);
+            ((CheckBox)b.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
 
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -271,29 +261,38 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     if (!isChecked){
                         filtrosAplicados.get("tipo").remove(tipo);
                     }
+
                 }
             });
             filtrosTipo.addView(b);
         }
     }
     private void agregarFiltroTemaCon(ArrayList<String> aux) {
-        int ancho = filtrosTema.getLayoutParams().width/filtrosTema.getColumnCount();
-        for (String nombreMat:aux){
+        for (final String nombreMat:aux){
             if (Character.isUpperCase( nombreMat.charAt(0)) || Character.isUpperCase( nombreMat.charAt(1))) {
-
-
-                CheckBox b = crearChecBox(nombreMat);
+                GridLayout b = crearChecBox(nombreMat);
+                ((CheckBox)b.getChildAt(0)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked){
+                            filtrosAplicados.get("tema").add(nombreMat);
+                        }
+                        if (!isChecked){
+                            filtrosAplicados.get("tema").remove(nombreMat);
+                        }
+                    }
+                });
                 filtrosTema.addView(b);
             }
         }
-
     }
     private void quitarFiltroTemaCon(ArrayList<String> aux){
         for (String nombreMat:aux){
-            for (int i=0;i<filtrosTema.getChildCount();i++){
-                CheckBox c = (CheckBox)filtrosTema.getChildAt(i);
+            for (int i=1;i<filtrosTema.getChildCount();i++){
+                GridLayout conjuntoChecbox = (GridLayout) filtrosTema.getChildAt(i);
+                TextView c = (TextView) conjuntoChecbox.getChildAt(1);
                 if (c.getText().toString() == nombreMat){
-                    filtrosTema.removeView(c);
+                    filtrosTema.removeView(conjuntoChecbox);
                 }
             }
         }
@@ -324,7 +323,15 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         mensajeAMostrar.setMargin(mensajeAMostrar.getXOffset(),20);
         mensajeAMostrar.show();
     }
-    private CheckBox crearChecBox(String texto) {
+    public static void mostrarMensajeLargo(String mensaje){
+        CharSequence cs = mensaje;
+        Toast mensajeAMostrar =Toast.makeText(appContext.getApplicationContext(),cs,Toast.LENGTH_LONG);
+        mensajeAMostrar.show();
+    }
+
+
+    private GridLayout crearChecBox(String texto) {
+        GridLayout grid = new GridLayout(appContext);
         CheckBox b = new CheckBox(appContext);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -333,14 +340,21 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             }
         });
         b.setPadding(5,5,5,5);
-        b.setBackgroundColor(Color.parseColor("#ff0099cc"));
-        b.setText(texto);
+        b.setTranslationX(10);
         b.setLinkTextColor(000000);
+
+        TextView text = new TextView(appContext);
+        text.setText(texto);
+        text.setTextColor(Color.BLACK);
+        grid.setColumnCount(2);
+        grid.addView(b);
+        grid.addView(text);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             b.setElevation(8);
         }
-        return b;
+        return grid;
+
     }
 
     public static void vibrar(Long milisegundos){
@@ -348,9 +362,21 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             return;
         }
 
-        vibrador.vibrate(milisegundos);
+        //vibrador.vibrate(milisegundos);
+    }
+    public static AppCompatActivity getInstance(){
+        return miInstancia;
     }
 
+    @Override
+    public void onBackPressed() {
+        if (listView.getVisibility() != View.GONE) {
+            listView.setVisibility(View.GONE);
+            return;
+        }
+        // Otherwise defer to system default behavior.
+        super.onBackPressed();
+    }
 }
 
 

@@ -4,22 +4,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorControlHighlight"
+    android:theme="@style/AppTheme"
+    app:statusBarBackground="@color/colorPrimary"
     tools:context="com.ruccon.clases.rucconapp.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="wrap_content">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/colorPrimaryDark"
             app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:title="RuconApp" />
+            app:title="RuconApp"
+            app:titleTextColor="?attr/colorButtonNormal">
 
+            <Button
+                android:id="@+id/botonActualizar"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="right"
+                android:background="@android:drawable/ic_popup_sync"
+                android:elevation="0dp"
+                app:layout_anchor="@+id/include"
+                app:layout_anchorGravity="top|right" />
+
+        </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
 
@@ -28,5 +40,6 @@
         layout="@layout/content_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 
 </android.support.design.widget.CoordinatorLayout>

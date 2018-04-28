@@ -1,9 +1,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/objetoListaFiltrada"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="6dip">
+    android:padding="6dip"
+    tools:background="@drawable/item_de_lista_background">
 
     <TextView
         android:id="@+id/secondLine"
@@ -31,7 +33,6 @@
         android:text="Example application"
         android:textColor="@android:color/background_dark"
         android:textSize="16sp" />
-
 
 
 </RelativeLayout>

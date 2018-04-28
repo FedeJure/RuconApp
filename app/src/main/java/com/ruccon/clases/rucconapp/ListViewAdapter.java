@@ -2,7 +2,6 @@ package com.ruccon.clases.rucconapp;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
@@ -15,8 +14,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
+import java.lang.reflect.Array;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -28,10 +29,12 @@ public class ListViewAdapter extends BaseAdapter {
     Context context;
     LayoutInflater inflater;
     ArrayList<String> lista;
-    ArrayList<String> listaAux;
+    ArrayList<String> listaDeFiltros;
+    ArrayList<String> filtrosAplicados;
     ArrayList<String> nombresMatUsados;
     ListView vistaLista;
     MaterialesRuccon materiales;
+    String textoIngresado = "";
 
 
 
@@ -40,8 +43,8 @@ public class ListViewAdapter extends BaseAdapter {
         this.context = context;
         this.lista = lista;  // lista con palabras clave
         inflater = LayoutInflater.from(this.context);
-        listaAux = new ArrayList<String>();
-        listaAux.addAll(lista);
+        listaDeFiltros = materiales.getListaPalabrasClave();
+        filtrosAplicados = new ArrayList<String>();
         nombresMatUsados = new ArrayList<String>();
         vistaLista.setVisibility(View.INVISIBLE);
         this.materiales = materiales;
@@ -105,14 +108,12 @@ public class ListViewAdapter extends BaseAdapter {
         }
 
         holder.tipoMaterial.setText(tipoMat);
-        setListaMateriales(convertView,lista.get(position));
         View.OnClickListener onClick = new View.OnClickListener() {
-
-
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context,DetalleMaterial.class);
                 intent.putExtra("nombreMaterial",lista.get(position));
+                intent.putExtra("textoIngresado",textoIngresado);
                 context.startActivity(intent);
             }
 
@@ -121,90 +122,21 @@ public class ListViewAdapter extends BaseAdapter {
 
 
 
-
         return convertView;
 
     }
 
-    private void setListaMateriales(View view, final String palabraClave) {
-        /*final ListView listaMateriales = (ListView) view.findViewById(R.id.listaMateriales);
-
-        //final String[] aux = materiales.getMaterialesConPalabraClave(palabraClave).toArray(new String[]{});
-        final String[] aux = {palabraClave};
-
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(view.getContext(), simple_list_item_1,text1,aux);
-        listaMateriales.setAdapter(adapter);
-
-
-
-        AdapterView.OnItemClickListener onClick = new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // MODIFICAR ESTO PARA QUE ENGRESE AL DETALLE DE UN MATERIAL ESPECIFICO+
-
-                String tipoMaterial = aux[position];
-
-
-
-                Intent intent = new Intent(context,DetalleMaterial.class);
-                intent.putExtra("tipoMaterial",tipoMaterial);
-                intent.putExtra("palabraClave",palabraClave);
-
-                context.startActivity(intent);
-            }
-
-
-        };
-
-        listaMateriales.setOnItemClickListener(onClick);*/
-    }
 
     public void filter(String charText){
-
-
-        vistaLista.setVisibility(View.VISIBLE);
-        charText = normalizarTexto(charText);
-        String[] filtros = charText.split(" ");
-        lista.clear();
-        nombresMatUsados.clear();
-        for (String unFiltro : filtros) {
-
-
-            ArrayList<String> listaFiltros = new ArrayList<String>();
-            if (unFiltro.length() != 0) {
-                for (String s : listaAux) {
-                    for (String filtro : parsearString(charText)) {
-
-                        if (normalizarTexto(s).contains(normalizarTexto(filtro))) {
-                            if (!listaFiltros.contains(s)) {
-                                listaFiltros.add(s);
-
-                            }
-
-                        }
-
-                    }
-                }
-                if (listaFiltros.isEmpty()) return;
-
-                for (String s1 : materiales.getMaterialesConPalabrasClave(listaFiltros)) {
-
-                    if (!nombresMatUsados.contains(s1)) {
-                        nombresMatUsados.add(s1);
-
-                        lista.add(s1);
-                    }
-                }
-
-            }
+        textoIngresado = charText;
+        if (charText.length() == 0){
+            lista.clear();
+            vistaLista.setVisibility(View.GONE);
+            notifyDataSetChanged();
+            return;
         }
-       /* Set<String> hs = new HashSet<>();
-        hs.addAll(lista);
-        lista.clear();
-        lista.addAll(hs);
-*/
-
+        vistaLista.setVisibility(View.VISIBLE);
+        lista = materiales.getMaterialesConPalabrasClave(charText.split(" "));
         notifyDataSetChanged();
     }
 
@@ -227,10 +159,6 @@ public class ListViewAdapter extends BaseAdapter {
     private String[] parsearString(String string){
         String delims = " ";
         String[] aux = string.split(delims);
-        for(String s: aux){
-
-
-        }
         return aux;
     }
 

@@ -10,6 +10,7 @@ package com.ruccon.clases.rucconapp;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class ProcesadorDeDatos {
     private static final String TIPO_IMPRESION = "TIPO_IMPRESION";
     private static final String TEMAS = "TEMAS_PAGINAS_PALABRASCLAVE";
     private static final String NIVEL = "NIVEL";
-
+    private String[] campos = new String[]{CODIGO,NOMBRE,MATERIA,TIPO_MATERIAL,TIPO_IMPRESION,TEMAS,NIVEL};
     SQLiteDatabase baseDeDatos;
 
     public ProcesadorDeDatos(SQLiteDatabase baseDeDatos) {
@@ -43,7 +44,7 @@ public class ProcesadorDeDatos {
     public ArrayList<Material> obtenerMateriales()  {
         ArrayList<Material> materiales = new ArrayList<>();
 
-        String[] campos = new String[]{CODIGO,NOMBRE,MATERIA,TIPO_MATERIAL,TIPO_IMPRESION,TEMAS,NIVEL};
+
 
         Cursor c = baseDeDatos.query(NOMBRE_TABLA,campos,null,null,null,null,null);
 
@@ -59,4 +60,21 @@ public class ProcesadorDeDatos {
 
         return materiales;
     }
+
+    public ArrayList<String> getNombreMaterialesConPalabrasClave(String[] claves) {
+        String whereQuery = "";
+        for (String clave : claves){
+            if (whereQuery.endsWith("'")){
+                whereQuery += " OR ";
+            }
+            whereQuery += TEMAS + " LIKE '%" + clave + "%'";
+        }
+        Cursor c = baseDeDatos.query(NOMBRE_TABLA,campos,whereQuery,null,null,null,null);
+        ArrayList<String> materiales = new ArrayList<>();
+        for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext()){
+            materiales.add(c.getString(1));
+        }
+        return materiales;
+    }
+
 }

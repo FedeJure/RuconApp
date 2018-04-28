@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,7 +24,11 @@ public class BusquedaFiltrada extends AppCompatActivity {
         setContentView(R.layout.activity_busqueda_filtrada);
 
         filtrosAplicados = (HashMap<String, ArrayList<String>>) getIntent().getExtras().get("filtrosAplicados");
-        listaMateriales = MaterialesRuccon.getInstance().materiales;
+        try {
+            listaMateriales = MaterialesRuccon.getInstance().materiales;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         lista = (ListView) findViewById(R.id.listaFiltrados);
 
         filtrarMateriales();
@@ -34,6 +39,7 @@ public class BusquedaFiltrada extends AppCompatActivity {
 
 
     }
+
 
     private String[] crearLista() {
         ArrayList<String> aux = new ArrayList<>();
@@ -49,14 +55,19 @@ public class BusquedaFiltrada extends AppCompatActivity {
         ArrayList<Material> aux = (ArrayList<Material>) listaMateriales.clone();
         for (String s : filtrosAplicados.get("materia")){
             for (Material m : listaMateriales){
-                if (!m.materia().equals(s)) aux.remove(m);
 
+                if (!m.materia().equals(s)) {
+                    aux.remove(m);
+                }
             }
 
         }
         for (String s : filtrosAplicados.get("tema")){
+            Log.d("DEBUG",s);
             for (Material m : listaMateriales){
-                if (!m.getTemas().contains(s)) aux.remove(m);
+                if (!m.getTemas().contains(s)) {
+                    aux.remove(m);
+                }
 
             }
 
@@ -64,7 +75,9 @@ public class BusquedaFiltrada extends AppCompatActivity {
         for (String s : filtrosAplicados.get("nivel")){
             for (Material m : listaMateriales){
 
-                if (!m.nivel().equals(s)) aux.remove(m);
+                if (!m.nivel().equals(s)) {
+                    aux.remove(m);
+                }
 
             }
 
@@ -72,7 +85,9 @@ public class BusquedaFiltrada extends AppCompatActivity {
         for (String s : filtrosAplicados.get("tipo")){
             for (Material m : listaMateriales){
 
-                if (!m.tipo().contains(s)) aux.remove(m);
+                if (!m.tipo().contains(s)) {
+                    aux.remove(m);
+                }
 
             }
 
@@ -80,7 +95,9 @@ public class BusquedaFiltrada extends AppCompatActivity {
         for (String s : filtrosAplicados.get("tipoImpresion")){
             for (Material m : listaMateriales){
 
-                if (!m.tipoImpresion().equals(s)) aux.remove(m);
+                if (!m.tipoImpresion().equals(s)) {
+                    aux.remove(m);
+                }
 
             }
 

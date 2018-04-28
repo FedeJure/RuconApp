@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class ElegirTipoMaterial extends AppCompatActivity {
@@ -17,7 +18,12 @@ public class ElegirTipoMaterial extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_elegir_tipo_material);
         nombreMateria = getIntent().getStringExtra("nombreMateria");
-        ArrayList<Material> materiales = MaterialesRuccon.getInstance().getMatrialPorMateria(nombreMateria);
+        ArrayList<Material> materiales = null;
+        try {
+            materiales = MaterialesRuccon.getInstance().getMatrialPorMateria(nombreMateria);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         ArrayList<String> tipos = new ArrayList<>();
 
         GridLayout grid = (GridLayout) this.findViewById(R.id.grillaBotonesTipos);

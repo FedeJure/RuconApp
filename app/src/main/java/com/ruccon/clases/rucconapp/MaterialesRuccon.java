@@ -49,15 +49,10 @@ public class MaterialesRuccon {
         cargarDatos();
 
     }
-    public static MaterialesRuccon getInstance() {
+    public static MaterialesRuccon getInstance() throws IOException {
         if (miInstancia == null){
+            miInstancia = new MaterialesRuccon();
 
-            try {
-                miInstancia = new MaterialesRuccon();
-            } catch (IOException e) {
-
-                e.printStackTrace();
-            }
 
         }
         return miInstancia;
@@ -143,12 +138,18 @@ public class MaterialesRuccon {
 
     }
 
+    public ArrayList<String> getMaterialesConPalabrasClave (String[] claves){
+        return procesador.getNombreMaterialesConPalabrasClave(claves);
+    }
+
     public ArrayList<String> getListaPalabrasClave(){
 
         return new ArrayList<String>(materialesPorPalabraClave.keySet());
     }
 
     public ArrayList<String> getMaterialesConPalabraClave(String palabra){
+
+
         ArrayList<String> aux = new ArrayList<String>();
 
         HashMap<String,String> auxMap = new HashMap<>();
@@ -156,6 +157,21 @@ public class MaterialesRuccon {
         if (!materialesPorPalabraClave.containsKey(palabra) ) return aux;
         for (Material m : materialesPorPalabraClave.get(palabra)){
             auxMap.put(m.nombre(),"");
+
+        }
+        aux.addAll(auxMap.keySet());
+        return aux;
+    }
+    public ArrayList<Material> getMaterialesConPalabraClave1(String palabra){
+
+
+        ArrayList<Material> aux = new ArrayList<Material>();
+
+        HashMap<Material,String> auxMap = new HashMap<>();
+
+        if (!materialesPorPalabraClave.containsKey(palabra) ) return aux;
+        for (Material m : materialesPorPalabraClave.get(palabra)){
+            auxMap.put(m,"");
 
         }
         aux.addAll(auxMap.keySet());
@@ -199,10 +215,6 @@ public class MaterialesRuccon {
     public ArrayList<String> getMaterialesConPalabrasClave(ArrayList<String> filtros) {
 
         ArrayList<String> aux = new ArrayList<String>();
-
-        HashMap<String,String> auxMap = new HashMap<>();
-
-
         for (Material m : materiales){
 
             if (m.tieneFiltros(filtros))
@@ -214,5 +226,20 @@ public class MaterialesRuccon {
         }
 
         return aux;
+    }
+
+    public ArrayList<String> getMateriales() {
+        ArrayList<String> aux = new ArrayList<>();
+        for (Material m : materiales){
+            aux.add(m.nombre());
+        }
+        return aux;
+    }
+
+    public ArrayList<String> getTiposQueContenganPalabraClaveDeMaterial(String s, String nombreMaterial) {
+        Material mat = getMaterialConNombre(nombreMaterial);
+        ArrayList<String> palabrasClave = mat.getTemasConPalabraClave(s);
+
+        return palabrasClave;
     }
 }
